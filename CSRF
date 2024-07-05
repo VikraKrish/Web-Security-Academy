@@ -19,12 +19,7 @@ Common flaws in CSRF Token
    - CSRF Token tied to a cookie, but not with the same session cookie (Two different frameworks for Session handling & CSRF Validation, but not tied together)
 
 
-   Lab 4
-
    Goal - Exploit CSRF to change Email address
-
-   Credentials : wiener:peter
-                carlos:montoya
 
    Analysis -  
    
@@ -64,3 +59,9 @@ Common flaws in CSRF Token
      1. Inject a csrf key cookie in user's session (HTTP Header Injection)
          - finding a potential place to inject HTML Header
      2. Send a CSRF attack to victim with a known csrf token
+
+Defense Mechanism 2 : SameSite Cookie
+
+
+
+
