@@ -1,0 +1,66 @@
+How does CSRF work? 
+
+  - A relevant action
+  - Cookie-based session handling.
+  - No unpredictable request parameters. 
+
+
+Common CSRF Defense Mechanism
+   
+  - CSRF Token
+  - SameSite Cookie
+  - Referer-based validation
+
+Common flaws in CSRF Token
+ 
+   - Validation of CSRF Token (Both in GET and POST)
+   - Validation of token only when it is present
+   - CSRF Token not tied to User's session
+   - CSRF Token tied to a cookie, but not with the same session cookie (Two different frameworks for Session handling & CSRF Validation, but not tied together)
+
+
+   Lab 4
+
+   Goal - Exploit CSRF to change Email address
+
+   Credentials : wiener:peter
+                carlos:montoya
+
+   Analysis -  
+   
+   For CSRF to be possible
+   - A relevant action : change user's email
+   - Cookie-based session handling : session cookie
+   - No unpredictable request parameters 
+
+  Use Case 1: Testing CSRF Tokens
+   1. Remove the CSRF token and try if it accepts the request
+   2. Change the request method from POST to GET
+   3. See if user is already tied to a session
+
+   Use Case 2:  CSRF Token is tied to a CSRF Cookie 
+   (Two different frameworks for Session handling & CSRF Validation, but not tied together) 
+
+   1. Check if the CSRF token is tied to CSRF cookie
+      -submit invalid csrf token
+      -submit valid csrf token from other user
+       
+   2. Submit csrf key and csrf token from valid user 
+   
+    To exploit this vulnerability, we need to perform 2 things:
+    1. Inject a csrf key cookie in user's session (HTTP Header Injection)
+        - finding a potential place to inject HTML Header
+        Manually add known CSRF Key to a Set-Cookie Header (GET Request)
+        Issue a CSRF form with a CSRF Token to User 
+    2. Send a CSRF attack to victim with a known csrf token
+
+    Use Case 3: CSRF and CSRF Cookie are duplicated (We dont need other User's CSRF Key and Token pair)
+           - if the values are same, requuest is accepted
+           - stateless application
+           - double submit defense Mechanism
+     Cookie value does not matter, bcoz it is not stored in backend
+
+     To exploit this vulnerability, we need to perform 2 things:
+     1. Inject a csrf key cookie in user's session (HTTP Header Injection)
+         - finding a potential place to inject HTML Header
+     2. Send a CSRF attack to victim with a known csrf token
