@@ -1,0 +1,75 @@
+Cross-origin resource sharing (CORS) is a browser mechanism which enables controlled access to resources located outside of a given domain. 
+It extends and adds flexibility to the same-origin policy (SOP). However, it also provides potential for cross-domain attacks, 
+if a website's CORS policy is poorly configured and implemented. 
+CORS is not a protection against cross-origin attacks such as cross-site request forgery (CSRF).
+
+Same Origin policy
+
+The same-origin policy is a restrictive cross-origin specification 
+that limits the ability for a website to interact with resources outside of the source domain. 
+The same-origin policy was defined many years ago in response to potentially malicious cross-domain interactions, such as one website stealing private data from another. 
+It generally allows a domain to issue requests to other domains, but not to access the responses.
+
+The cross-origin resource sharing protocol uses a suite of HTTP headers 
+that define trusted web origins and associated properties such as whether authenticated access is permitted.
+
+ A controlled relaxation of the same-origin policy is possible using cross-origin resource sharing (CORS).
+
+
+ ##CORS vulnerability with basic origin reflection
+
+Goal : To fetch the admin's API key by exploiting the CORS misconfiguration
+Observation of the Lab
+
+ - Access Control Allow Credentials is set true 
+ - Access control Allow Origin is true for all domains
+ - Crafting a javscript to fetch the admin credentials from the exploit server
+ (We dont have access to admin credentials, should rely on burp for the )
+
+Analysis:
+
+Testing for CORS misconfigurations:
+1. Change the origin header to an arbitrary value
+2. Change the origin header to the null value
+3. Change the origin header to one that begins with the origin of the site.
+4. Change the origin header to one that ends with the origin of the site.
+
+
+ ##CORS vulnerability with null origin
+
+ Goal : To fetch the admin's API key by exploiting the CORS misconfiguration
+Observation of the Lab
+
+ - Access Control Allow Origin is set true for null
+ - Access Control Allow Credentials is set true
+ - Crafting a javscript in Sandbox as the origin will be null
+
+ ##Exploiting XSS via CORS trust relationship
+
+Even "correctly" configured CORS establishes a trust relationship between two origins. If a website trusts an origin that is vulnerable to cross-site scripting (XSS),
+then an attacker could exploit the XSS to inject some JavaScript that uses CORS to retrieve sensitive information from the site that trusts the vulnerable application
+ 
+Find an XSS Vulnerability
+Its a different sub domain (Note it)
+Find a CORS that accepts origin of different domain(manipulate)
+Craft a JavaScript for CORS
+Craft a Javascript for XSS
+Merge the CORS into XSS Script
+
+Most CORS attacks rely on the presence of the response header:
+Access-Control-Allow-Credentials: true
+Without that header, the victim user's browser will refuse to send their cookies, 
+meaning the attacker will only gain access to unauthenticated content, which they could just as easily access by 
+browsing directly to the target website.
+
+Prevention:
+
+CORS is a misconfiguration problem
+Only allow trusted sites
+Avoid whitelisting null
+Avoid wildcards in internal n/was
+CORS defines browser behaviors and is never a replacement for server-side protection of sensitive data
+
+
+
+
